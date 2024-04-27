@@ -8,5 +8,9 @@ namespace controle_estoque
 {
     class Vendas
     {
+        public string SKU { get; set; }
+        public int EstoqueSaida { get; set; }
+        public decimal PrecoSaida { get; set; }
+
     }
 }

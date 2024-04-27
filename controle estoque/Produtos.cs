@@ -9,16 +9,19 @@ namespace controle_estoque
     class Produtos
     {
         public string SKU { get; set; };
-        public string Produto { get; set; };
-        public int Quantidade { get; set; };
-        public decimal PrecoCompra { get; set; };
+        public string NomeProduto { get; set; };
+        public int QuantidadeEntrada { get; set; };
+        public decimal PrecoEntrada { get; set; };
+        public decimal PrecoSaida { get; set; };
 
-        public Produtos(string SKU, string Produto, int Quantidade, decimal PrecoCompra);
+        public Produtos(string SKU, string NomeProduto, int QuantidadeEntrada, decimal PrecoEntrada, PrecoSaida);
         {
         SKU = sku;
-            Produto = Produtos;
-            Quantidade = quantidade;
-            PrecoCompra = precocompra;
-    }
+NomeProduto = nomeProduto;
+QuantidadeEntrada = quantidadeEntrada;
+            PrecoEntrada = precoEntrada;
+            PrecoSaida = precoSaida;
+
+}
 
 }

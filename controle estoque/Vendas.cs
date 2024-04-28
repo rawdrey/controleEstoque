@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace controle_estoque
 {
-    class Vendas
+    public class Vendas
     {
         public string SKU { get; set; }
         public int EstoqueSaida { get; set; }

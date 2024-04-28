@@ -6,55 +6,75 @@ using System.Threading.Tasks;
 
 namespace controle_estoque
 {
-    public class Estoque: IControleEstoque
- 
-   {
-        privact Dictionary<string, Produtos> _Produtos;
-        
-    public Estoque()
+    public class Estoque : IControleEstoque
+    {
+        private readonly Dictionary<string, Produto> _produtos;
+
+        public Estoque()
         {
             _produtos = new Dictionary<string, Produto>();
+        }
 
-        }
-        public void AdcionarProduto(string sku, string nomeProduto, int estoqueEntrada, decimal precoEntrada, decimal precoSaida)
+        public void AdicionarProduto(string sku, string nomeProduto, int estoqueEntrada, decimal precoEntrada)
         {
-            var produto = new Produtos
+            if (_produtos.ContainsKey(sku))
             {
-                SKU = sku,
-                NomeProduto = nomeProduto,
-                EstoqueEntrada = estoqueEntrada,
-                PrecoEntrada = precoEntrada,
-                PrecoSaida = precoSaida
-            };
-            _produtos[sku] = produto;
-        }
-        public Produtos BuscarProdutosPorSKU( sku)
-        {
-            return _produtos.GetValueOrDefault(sku);
-
-        }
-        public void AtualizarEstoque(string sku, int estoqueSaida, decimal precoSaida)
-        {
-            var produto = BuscarProdutoPorSKU(sku);
-            if(produto != null)
-            {
-                produto.EstoqueEntrada -= EstoqueSaida;
-                Console.WriteLine($"Venda registrada: {estoqueSaida} unidades de produto.NomeProduto}");
-                var lucro = (precoSaida - produto.precoEntrada) * estoqueSaida;
-                Console.WriteLine($"O lucro da venda: {lucro:C}");
-}
+                _produtos[sku].Estoque += estoqueEntrada;
+                _produtos[sku].PrecoEntrada = precoEntrada;
+            }
             else
             {
-                Console.WriteLine($"Não há estoque suficiente para vender o produto {produto.NomeProduto}.");
-
+                var produto = new Produto
+                {
+                    SKU = sku,
+                    NomeProduto = nomeProduto,
+                    Estoque = estoqueEntrada,
+                    PrecoEntrada = precoEntrada,
+                };
+                _produtos[sku] = produto;
             }
-       else
+            Console.WriteLine("Produto adicionado/atualizado com sucesso!");
+        }
+
+        public Produto BuscarProdutoPorSKU(string sku)
+        {
+            Produto produto;
+            _produtos.TryGetValue(sku, out produto);
+            return produto;
+        }
+    
+
+    public void AtualizarEstoque(string sku, int quantidade, decimal precoSaida)
+        {
+            var produto = BuscarProdutoPorSKU(sku);
+            if (produto != null)
+            {
+                if (produto.Estoque >= quantidade)
+                {
+                    produto.Estoque -= quantidade;
+                    produto.PrecoSaida = precoSaida;
+                    Console.WriteLine($"Venda registrada: {quantidade} unidades de {produto.NomeProduto}.");
+                    var lucro = (precoSaida - produto.PrecoEntrada) * quantidade;
+                    Console.WriteLine($"Lucro da venda: {lucro:C}");
+                }
+                else
+                {
+                    Console.WriteLine($"Não há estoque suficiente de {produto.NomeProduto} para a venda.");
+                }
+            }
+            else
             {
                 Console.WriteLine($"Produto com SKU {sku} não encontrado.");
             }
         }
 
-
+        public void ListarProdutos()
+        {
+            Console.WriteLine("\nProdutos em Estoque:");
+            foreach (var produto in _produtos.Values)
+            {
+                Console.WriteLine($"SKU: {produto.SKU}, Nome: {produto.NomeProduto}, Estoque: {produto.Estoque}, Preço de Entrada: {produto.PrecoEntrada:C}");
+            }
+        }
     }
-
 }

@@ -18,9 +18,10 @@ namespace controle_estoque
                 Console.WriteLine("1. Adicionar produto");
                 Console.WriteLine("2. Adicionar venda");
                 Console.WriteLine("3. Listar produtos");
-                Console.WriteLine("4. Sair");
+                Console.WriteLine("4. Remover Produtos:");
+                Console.WriteLine("5. Sair");
 
-                Console.Write("Escolha uma opção (1/2/3/4): ");
+                Console.Write("Escolha uma opção (1/2/3/4/5): ");
                 var opcao = Console.ReadLine();
 
                 switch (opcao)
@@ -36,9 +37,11 @@ namespace controle_estoque
                     case "3":
                         estoque.ListarProdutos();
                         break;
-
                     case "4":
-                        // Sair
+                        RemoverProduto(estoque);
+                        break;
+                    case "5":
+                        
                         Console.WriteLine("Encerrando o programa.");
                         return;
 
@@ -117,5 +120,20 @@ namespace controle_estoque
                 Console.WriteLine("Venda concluída.");
             }
         }
+        static void RemoverProduto(Estoque estoque)
+        {
+            Console.Write("Incira o SKu desejado:");
+            string sku = Console.ReadLine();
+            if(estoque.RemoverProduto(sku))
+            {
+                    Console.WriteLine($"produto {nomeProduto} removido com sucesso.");
+            }
+            else
+            {
+                Console.WriteLine($"Produto com SKU {sku} não encontrado.");
+
+            }
+        }
+
     }
 }

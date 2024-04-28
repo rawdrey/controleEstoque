@@ -75,6 +75,17 @@ namespace controle_estoque
             {
                 Console.WriteLine($"SKU: {produto.SKU}, Nome: {produto.NomeProduto}, Estoque: {produto.Estoque}, Preço de Entrada: {produto.PrecoEntrada:C}");
             }
+
+        }
+
+        public bool RemoverProduto(string sku)
+        {
+            if (_produtos.ContainsKey(sku))
+            {
+                _produtos.Remove(sku);
+                return true;
+            }
+            return false;
         }
     }
 }

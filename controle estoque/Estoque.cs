@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace controle_estoque
 {
@@ -15,12 +12,13 @@ namespace controle_estoque
             _produtos = new Dictionary<string, Produto>();
         }
 
-        public void AdicionarProduto(string sku, string nomeProduto, int estoqueEntrada, decimal precoEntrada)
+        public void AdicionarProduto(string sku, string nomeProduto, int estoqueEntrada, decimal precoEntrada, decimal precoVenda)
         {
             if (_produtos.ContainsKey(sku))
             {
                 _produtos[sku].Estoque += estoqueEntrada;
                 _produtos[sku].PrecoEntrada = precoEntrada;
+                _produtos[sku].PrecoVenda = precoVenda;
             }
             else
             {
@@ -30,6 +28,7 @@ namespace controle_estoque
                     NomeProduto = nomeProduto,
                     Estoque = estoqueEntrada,
                     PrecoEntrada = precoEntrada,
+                    PrecoVenda = precoVenda
                 };
                 _produtos[sku] = produto;
             }
@@ -42,9 +41,8 @@ namespace controle_estoque
             _produtos.TryGetValue(sku, out produto);
             return produto;
         }
-    
 
-    public void AtualizarEstoque(string sku, int quantidade, decimal precoSaida)
+        public void AtualizarEstoque(string sku, int quantidade, decimal precoSaida)
         {
             var produto = BuscarProdutoPorSKU(sku);
             if (produto != null)
@@ -73,19 +71,8 @@ namespace controle_estoque
             Console.WriteLine("\nProdutos em Estoque:");
             foreach (var produto in _produtos.Values)
             {
-                Console.WriteLine($"SKU: {produto.SKU}, Nome: {produto.NomeProduto}, Estoque: {produto.Estoque}, Preço de Entrada: {produto.PrecoEntrada:C}");
+                Console.WriteLine($"SKU: {produto.SKU}, Nome: {produto.NomeProduto}, Estoque: {produto.Estoque}, Preço de Venda: {produto.PrecoVenda:C}");
             }
-
-        }
-
-        public bool RemoverProduto(string sku)
-        {
-            if (_produtos.ContainsKey(sku))
-            {
-                _produtos.Remove(sku);
-                return true;
-            }
-            return false;
         }
     }
 }

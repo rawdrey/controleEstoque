@@ -1,139 +1,255 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace controle_estoque
 {
     class Program
     {
+        static List<Vendedor> vendedores = new List<Vendedor>();
+
         static void Main(string[] args)
         {
-            var estoque = new Estoque();
-
             while (true)
             {
-                Console.WriteLine("\nControle de Estoque");
-                Console.WriteLine("1. Adicionar produto");
-                Console.WriteLine("2. Adicionar venda");
-                Console.WriteLine("3. Listar produtos");
-                Console.WriteLine("4. Remover Produtos:");
-                Console.WriteLine("5. Sair");
+                Console.WriteLine("Controle de Estoque");
+                Console.WriteLine("1 - Adicionar Vendedor");
+                Console.WriteLine("2 - Adicionar Produto");
+                Console.WriteLine("3 - Pesquisar Produto");
+                Console.WriteLine("4 - Listar Produtos");
+                Console.WriteLine("5 - Adicionar Venda");
+                Console.WriteLine("6 - Listar Vendedores");
+                Console.WriteLine("7 - Ver Vendas e Lucro de um Vendedor");
+                Console.WriteLine("8 - Sair");
+                Console.Write("Escolha uma opção: ");
 
-                Console.Write("Escolha uma opção (1/2/3/4/5): ");
-                var opcao = Console.ReadLine();
+                string opcao = Console.ReadLine();
 
                 switch (opcao)
                 {
                     case "1":
-                        AdicionarProduto(estoque);
+                        AdicionarVendedor();
                         break;
-
                     case "2":
-                        AdicionarVenda(estoque);
+                        AdicionarProduto();
                         break;
-
                     case "3":
-                        estoque.ListarProdutos();
+                        PesquisarProduto();
                         break;
                     case "4":
-                        RemoverProduto(estoque);
+                        ListarProdutos();
                         break;
                     case "5":
-                        
-                        Console.WriteLine("Encerrando o programa.");
+                        AdicionarVenda();
+                        break;
+                    case "6":
+                        ListarVendedores();
+                        break;
+                    case "7":
+                        VerVendasLucroVendedor();
+                        break;
+                    case "8":
+                        Console.WriteLine("Saindo do programa...");
                         return;
-
                     default:
-                        Console.WriteLine("Opção inválida. Digite novamente.");
+                        Console.WriteLine("Opção inválida. Tente novamente.");
                         break;
                 }
+
+                Console.WriteLine(); // Adiciona uma linha em branco para melhorar a legibilidade
             }
         }
 
-        static void AdicionarProduto(Estoque estoque)
+        static void AdicionarVendedor()
         {
+            Console.WriteLine("Adicionar Vendedor");
+            Console.Write("Nome completo: ");
+            string nome = Console.ReadLine();
+            Console.Write("CPF: ");
+            string cpf = Console.ReadLine();
+            Console.Write("Telefone: ");
+            string telefone = Console.ReadLine();
+            Console.Write("E-mail: ");
+            string email = Console.ReadLine();
+            Console.Write("Rua: ");
+            string rua = Console.ReadLine();
+            Console.Write("Número: ");
+            string numero = Console.ReadLine();
+            Console.Write("Complemento: ");
+            string complemento = Console.ReadLine();
+            Console.Write("Cidade: ");
+            string cidade = Console.ReadLine();
+            Console.Write("Estado: ");
+            string estado = Console.ReadLine();
+
+            Endereco endereco = new Endereco(rua, numero, complemento, cidade, estado);
+            Vendedor vendedor = new Vendedor(nome, cpf, telefone, email, endereco);
+            vendedores.Add(vendedor);
+
+            Console.WriteLine("Vendedor cadastrado com sucesso.");
+        }
+
+        static void AdicionarProduto()
+        {
+            Console.WriteLine("Adicionar Produto");
+
+            if (vendedores.Count == 0)
+            {
+                Console.WriteLine("Nenhum vendedor cadastrado.");
+                return;
+            }
+
+            ListarVendedores();
+
+            Console.Write("Escolha o número do vendedor: ");
+            int indiceVendedor = int.Parse(Console.ReadLine()) - 1;
+
+            if (indiceVendedor < 0 || indiceVendedor >= vendedores.Count)
+            {
+                Console.WriteLine("Vendedor não encontrado.");
+                return;
+            }
+
+            var vendedor = vendedores[indiceVendedor];
+
+            Console.Write("SKU: ");
+            string sku = Console.ReadLine();
+            Console.Write("Nome do Produto: ");
+            string nomeProduto = Console.ReadLine();
+            Console.Write("Preço de Compra: ");
+            decimal precoCompra = decimal.Parse(Console.ReadLine());
+            Console.Write("Preço de Venda: ");
+            decimal precoVenda = decimal.Parse(Console.ReadLine());
+            Console.Write("Estoque Inicial: ");
+            int estoqueEntrada = int.Parse(Console.ReadLine());
+
+            vendedor.Estoque.AdicionarProduto(sku, nomeProduto, estoqueEntrada, precoCompra, precoVenda);
+
+            Console.WriteLine("Produto adicionado com sucesso.");
+        }
+
+        static void PesquisarProduto()
+        {
+            if (vendedores.Count == 0)
+            {
+                Console.WriteLine("Nenhum vendedor cadastrado.");
+                return;
+            }
+
             Console.Write("Digite o SKU do produto: ");
-            var sku = Console.ReadLine();
-            Console.Write("Digite o nome do produto: ");
-            var nomeProduto = Console.ReadLine();
-            Console.Write("Digite a quantidade em estoque: ");
-            int estoqueEntrada;
-            if (!int.TryParse(Console.ReadLine(), out estoqueEntrada) || estoqueEntrada <= 0)
+            string sku = Console.ReadLine();
+
+            foreach (var vendedor in vendedores)
             {
-                Console.WriteLine("Quantidade em estoque inválida.");
-                return;
-            }
-            Console.Write("Digite o preço de entrada: ");
-            decimal precoEntrada;
-            if (!decimal.TryParse(Console.ReadLine(), out precoEntrada) || precoEntrada <= 0)
-            {
-                Console.WriteLine("Preço de entrada inválido.");
-                return;
+                Produto produto = vendedor.Estoque.BuscarProdutoPorSKU(sku);
+                if (produto != null)
+                {
+                    Console.WriteLine($"Produto encontrado - Vendedor: {vendedor.Nome}, Nome: {produto.NomeProduto}, Estoque: {produto.Estoque}, Preço: {produto.PrecoVenda:C}");
+                    return;
+                }
             }
 
-            estoque.AdicionarProduto(sku, nomeProduto, estoqueEntrada, precoEntrada);
+            Console.WriteLine("Produto não encontrado.");
         }
 
-        static void AdicionarVenda(Estoque estoque)
+        static void ListarProdutos()
         {
-            Console.Write("Digite o SKU do produto vendido: ");
-            var sku = Console.ReadLine();
-            var produto = estoque.BuscarProdutoPorSKU(sku);
+            if (vendedores.Count == 0)
+            {
+                Console.WriteLine("Nenhum vendedor cadastrado.");
+                return;
+            }
+
+            foreach (var vendedor in vendedores)
+            {
+                Console.WriteLine($"Vendedor: {vendedor.Nome}");
+                vendedor.Estoque.ListarProdutos();
+            }
+        }
+
+        static void AdicionarVenda()
+        {
+            if (vendedores.Count == 0)
+            {
+                Console.WriteLine("Nenhum vendedor cadastrado.");
+                return;
+            }
+
+            Console.WriteLine("Adicionar Venda");
+
+            ListarVendedores();
+
+            Console.Write("Escolha o número do vendedor: ");
+            int indiceVendedor = int.Parse(Console.ReadLine()) - 1;
+
+            if (indiceVendedor < 0 || indiceVendedor >= vendedores.Count)
+            {
+                Console.WriteLine("Vendedor não encontrado.");
+                return;
+            }
+
+            var vendedor = vendedores[indiceVendedor];
+
+            Console.Write("SKU do produto: ");
+            string sku = Console.ReadLine();
+            Console.Write("Quantidade: ");
+            int quantidade = int.Parse(Console.ReadLine());
+
+            Produto produto = vendedor.Estoque.BuscarProdutoPorSKU(sku);
             if (produto == null)
             {
-                Console.WriteLine($"Produto com SKU {sku} não encontrado.");
+                Console.WriteLine("Produto não encontrado.");
                 return;
             }
 
-            Console.WriteLine($"Nome do produto: {produto.NomeProduto}");
+            vendedor.Estoque.AtualizarEstoque(sku, quantidade, produto.PrecoVenda);
 
-            Console.Write("Digite a quantidade vendida: ");
-            int quantidade;
-            if (!int.TryParse(Console.ReadLine(), out quantidade) || quantidade <= 0)
-            {
-                Console.WriteLine("Quantidade vendida inválida.");
-                return;
-            }
-
-            if (produto.Estoque < quantidade)
-            {
-                Console.WriteLine($"Não há estoque suficiente de {produto.NomeProduto} para a venda.");
-                return;
-            }
-
-            Console.Write("Digite o preço de saída: ");
-            decimal precoSaida;
-            if (!decimal.TryParse(Console.ReadLine(), out precoSaida) || precoSaida <= 0)
-            {
-                Console.WriteLine("Preço de saída inválido.");
-                return;
-            }
-
-            estoque.AtualizarEstoque(sku, quantidade, precoSaida);
-
-            Console.Write("Deseja continuar vendendo (S/N)? ");
-            var continuar = Console.ReadLine();
-            if (continuar.ToUpper() != "S")
-            {
-                Console.WriteLine("Venda concluída.");
-            }
         }
-        static void RemoverProduto(Estoque estoque)
+
+        static void ListarVendedores()
         {
-            Console.Write("Incira o SKu desejado:");
-            string sku = Console.ReadLine();
-            if(estoque.RemoverProduto(sku))
+            Console.WriteLine("\nLista de Vendedores:");
+            for (int i = 0; i < vendedores.Count; i++)
             {
-                    Console.WriteLine($"produto {nomeProduto} removido com sucesso.");
-            }
-            else
-            {
-                Console.WriteLine($"Produto com SKU {sku} não encontrado.");
-
+                Console.WriteLine($"{i + 1} - {vendedores[i].Nome}");
             }
         }
 
+        static void VerVendasLucroVendedor()
+        {
+            if (vendedores.Count == 0)
+            {
+                Console.WriteLine("Nenhum vendedor cadastrado.");
+                return;
+            }
+
+            ListarVendedores();
+
+            Console.Write("Escolha o número do vendedor: ");
+            int indiceVendedor = int.Parse(Console.ReadLine()) - 1;
+
+            if (indiceVendedor < 0 || indiceVendedor >= vendedores.Count)
+            {
+                Console.WriteLine("Vendedor não encontrado.");
+                return;
+            }
+
+            var vendedor = vendedores[indiceVendedor];
+
+            Console.WriteLine($"\nVendas e Lucro do Vendedor: {vendedor.Nome}");
+            foreach (var venda in vendedor.Estoque.Vendas)
+            {
+                Console.WriteLine($"SKU: {venda.SKU}, Quantidade: {venda.EstoqueSaida}, Preço de Venda: {venda.PrecoSaida:C}");
+            }
+
+            decimal lucroTotal = 0;
+            foreach (var venda in vendedor.Estoque.Vendas)
+            {
+                var produto = vendedor.Estoque.BuscarProdutoPorSKU(venda.SKU);
+                decimal lucro = (venda.PrecoSaida - produto.PrecoEntrada) * venda.EstoqueSaida;
+                lucroTotal += lucro;
+            }
+
+            Console.WriteLine($"Lucro Total: {lucroTotal:C}");
+        }
     }
 }
